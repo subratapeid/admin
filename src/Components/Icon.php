@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminPanel\View\Components;
+namespace Pagelyne\Admin\View\Components;
 
 use Illuminate\View\Component;
 use Illuminate\View\View;
@@ -14,6 +14,6 @@ class Icon extends Component
 
     public function render(): View
     {
-        return view('admin-panel::components.icon');
+        return view('admin::components.icon');
     }
 }

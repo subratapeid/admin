@@ -1,13 +1,14 @@
 {
-    "name": "pagelyne/pgl-admin",
+    "name": "pagelyne/admin",
     "description": "Reusable Pagelyne Admin Panel package",
     "type": "library",
     "license": "proprietary",
     "version": "1.0.0",
     "require": {
-        "php": "^8.4",
-        "illuminate/support": "^13.0",
-        "illuminate/view": "^13.0"
+        "php": "^8.4"
+    },
+    "require-dev": {
+        "laravel/framework": "^13.32"
     },
     "autoload": {
         "psr-4": {
