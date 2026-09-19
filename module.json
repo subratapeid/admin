@@ -1,0 +1,7 @@
+{
+    "name": "pagelyne/admin-panel",
+    "version": "1.0.0",
+    "type": "frontend",
+    "description": "Reusable administration panel UI for Pagelyne applications",
+    "dependencies": []
+}
