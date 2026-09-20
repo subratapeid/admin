@@ -4,15 +4,54 @@ declare(strict_types=1);
 
 namespace Pagelyne\Admin\Layout;
 
+use Illuminate\Support\Facades\File;
 use InvalidArgumentException;
 
 class LayoutManager
 {
-    protected array $layouts;
+    protected string $path;
+
+    protected array $layouts = [];
 
     public function __construct()
     {
-        $this->layouts = config('admin.layouts', []);
+        $this->path = __DIR__ . '/../../resources/views/layouts';
+
+        $this->load();
+    }
+
+    protected function load(): void
+    {
+        if (!File::isDirectory($this->path)) {
+            return;
+        }
+
+        foreach (File::directories($this->path) as $directory) {
+            $file = $directory . '/layout.json';
+
+            if (!File::exists($file)) {
+                continue;
+            }
+
+            $config = json_decode(
+                File::get($file),
+                true
+            );
+
+            if (!is_array($config)) {
+                continue;
+            }
+
+            $key = $config['key'] ?? basename($directory);
+
+            $this->layouts[$key] = array_merge([
+                'key' => $key,
+                'name' => $key,
+                'active' => true,
+                'description' => null,
+                'view' => 'admin::layouts.' . $key . '.app',
+            ], $config);
+        }
     }
 
     public function active(): LayoutDefinition
@@ -27,6 +66,12 @@ class LayoutManager
         if (!isset($this->layouts[$key])) {
             throw new InvalidArgumentException(
                 "Admin layout [{$key}] is not registered."
+            );
+        }
+
+        if (!($this->layouts[$key]['active'] ?? false)) {
+            throw new InvalidArgumentException(
+                "Admin layout [{$key}] is inactive."
             );
         }
 
@@ -72,5 +117,30 @@ class LayoutManager
                     new LayoutDefinition($key, $config)
             )
             ->all();
+    }
+
+    public function activeLayouts(): array
+    {
+        return collect($this->layouts)
+            ->filter(
+                fn(array $config) =>
+                    ($config['active'] ?? false) === true
+            )
+            ->map(
+                fn(array $config, string $key) =>
+                    new LayoutDefinition($key, $config)
+            )
+            ->all();
+    }
+
+    public function has(string $key): bool
+    {
+        return isset($this->layouts[$key]);
+    }
+
+    public function isActive(string $key): bool
+    {
+        return isset($this->layouts[$key])
+            && ($this->layouts[$key]['active'] ?? false) === true;
     }
 }

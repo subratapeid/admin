@@ -8,35 +8,28 @@ return [
 
     'active-layout' => 'basic',
 
-    'layouts' => [
+    'user' => [
+        'name' => 'username',
+        'email' => fn($user) => $user->email,
+        'phone' => fn($user) => $user->phone,
+        'avatar' => 'avatar',
+    ],
 
-        'basic' => [
-            'name' => 'basic',
-            'view' => 'admin::layouts.basic.app',
-            'components' => [
-                'sidebar' => 'admin::layouts.classic.sidebar',
-                'topbar' => 'admin::layouts.classic.topbar',
-            ],
-        ],
+    'application' => [
+        'name' => env('APP_NAME'),
+        'logo' => null,
+    ],
 
-        'classic' => [
-            'name' => 'Classic',
-            'view' => 'admin::layouts.classic.app',
-            'components' => [
-                'sidebar' => 'admin::layouts.classic.sidebar',
-                'topbar' => 'admin::layouts.classic.topbar',
-            ],
-        ],
+    'routes' => [
+        'login' => 'login',
+        'logout' => 'admin.logout',
+        'register' => 'register',
+        'forgot-password' => 'password.request',
+    ],
 
-        'modern' => [
-            'name' => 'Modern',
-            'view' => 'admin::layouts.modern.app',
-            'components' => [
-                'sidebar' => 'admin::layouts.modern.sidebar',
-                'topbar' => 'admin::layouts.modern.topbar',
-            ],
-        ],
-
+    'footer' => [
+        'enabled' => true,
+        'text' => null,
     ],
 
 ];

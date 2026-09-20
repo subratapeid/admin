@@ -1,0 +1,17 @@
+{
+  "name": "pagelyne-admin",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "* @source \"../../vendor/pagelyne/admin/src\";\r * @source \"../../vendor/pagelyne/admin/resources/views\";",
+  "main": "index.js",
+  "scripts": {
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^6.4.3"
+  }
+}

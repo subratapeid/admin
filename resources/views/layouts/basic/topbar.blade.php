@@ -37,18 +37,18 @@
             <div class="text-right">
 
                 <div class="text-sm font-semibold text-slate-900">
-                    {{ auth()->user()->name ?? 'Administrator' }}
+                    {{ $admin->user()->name() }}
                 </div>
 
                 <div class="text-xs text-slate-400">
-                    Administrator
+                    {{ $admin->user()->role() ?? 'No Role' }}
                 </div>
 
             </div>
 
             <div
                 class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
-                {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                {{ strtoupper(substr($admin->user()->name() ?? 'P', 0, 1)) }}
             </div>
 
         </div>
