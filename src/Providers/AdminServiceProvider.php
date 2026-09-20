@@ -4,6 +4,7 @@ namespace Pagelyne\Admin\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Pagelyne\Admin\Layout\LayoutManager;
 use Pagelyne\Admin\Navigation\NavigationManager;
 
 class AdminServiceProvider extends ServiceProvider
@@ -14,6 +15,11 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->singleton(
             NavigationManager::class,
             fn() => new NavigationManager()
+        );
+
+        $this->app->singleton(
+            LayoutManager::class,
+            fn() => new LayoutManager()
         );
 
         $this->mergeConfigFrom(

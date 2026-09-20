@@ -3,16 +3,14 @@
 declare(strict_types=1);
 
 namespace Pagelyne\Admin\Navigation;
-
+use Illuminate\Support\Facades\Blade;
 class NavigationManager
 {
-    protected array $navigation = [];
+    protected array $navigation;
 
-    public function register(?array $navigation): void
+    public function __construct()
     {
-        $this->navigation = is_array($navigation)
-            ? $navigation
-            : [];
+        $this->navigation = config('navigation', []);
     }
 
     public function items(): array
@@ -83,7 +81,7 @@ class NavigationManager
 
     protected function normalize(array $item): array
     {
-        return array_merge([
+        $item = array_merge([
             'id' => null,
             'label' => '',
             'icon' => null,
@@ -105,14 +103,24 @@ class NavigationManager
             'order' => 9999,
 
             'children' => [],
+
         ], $item);
+
+        if (!empty($item['icon'])) {
+            $item['icon'] = $this->renderIcon($item['icon']);
+        }
+        return $item;
+    }
+
+    protected function renderIcon(string $icon): string
+    {
+        return Blade::render(
+            '<x-admin::icons.' . $icon . ' />'
+        );
     }
 
     protected function hasAccess(array $item): bool
     {
-        /*
-         * No access restrictions.
-         */
         if (
             empty($item['roles']) &&
             empty($item['permissions'])
@@ -124,6 +132,8 @@ class NavigationManager
             return false;
         }
 
+        $user = auth()->user();
+
         $roleAccess = null;
         $permissionAccess = null;
 
@@ -132,9 +142,14 @@ class NavigationManager
          */
         if (!empty($item['roles'])) {
 
-            $roleAccess = $item['role_condition'] === 'all'
-                ? auth()->user()->hasAllRoles($item['roles'])
-                : auth()->user()->hasAnyRole($item['roles']);
+            if (
+                method_exists($user, 'hasAllRoles') &&
+                method_exists($user, 'hasAnyRole')
+            ) {
+                $roleAccess = $item['role_condition'] === 'all'
+                    ? $user->hasAllRoles($item['roles'])
+                    : $user->hasAnyRole($item['roles']);
+            }
         }
 
         /*
@@ -142,43 +157,64 @@ class NavigationManager
          */
         if (!empty($item['permissions'])) {
 
-            if ($item['permission_condition'] === 'all') {
+            if (method_exists($user, 'can')) {
 
-                $permissionAccess = true;
+                if ($item['permission_condition'] === 'all') {
 
-                foreach ($item['permissions'] as $permission) {
+                    $permissionAccess = true;
 
-                    if (!auth()->user()->can($permission)) {
-                        $permissionAccess = false;
-                        break;
+                    foreach ($item['permissions'] as $permission) {
+
+                        if (!$user->can($permission)) {
+                            $permissionAccess = false;
+                            break;
+                        }
                     }
-                }
 
-            } else {
+                } else {
 
-                $permissionAccess = false;
+                    $permissionAccess = false;
 
-                foreach ($item['permissions'] as $permission) {
+                    foreach ($item['permissions'] as $permission) {
 
-                    if (auth()->user()->can($permission)) {
-                        $permissionAccess = true;
-                        break;
+                        if ($user->can($permission)) {
+                            $permissionAccess = true;
+                            break;
+                        }
                     }
                 }
             }
         }
 
         /*
+         * No role/permission system available.
+         *
+         * Ignore the corresponding restrictions.
+         */
+        if (
+            $roleAccess === null &&
+            $permissionAccess === null
+        ) {
+            return true;
+        }
+
+        /*
          * Only role restriction.
          */
-        if ($roleAccess !== null && $permissionAccess === null) {
+        if (
+            $roleAccess !== null &&
+            $permissionAccess === null
+        ) {
             return $roleAccess;
         }
 
         /*
          * Only permission restriction.
          */
-        if ($roleAccess === null && $permissionAccess !== null) {
+        if (
+            $roleAccess === null &&
+            $permissionAccess !== null
+        ) {
             return $permissionAccess;
         }
 

@@ -1,1 +1,1 @@
-console.log("Vendor admin Package js loaded");
+import './alpine.min.js';
