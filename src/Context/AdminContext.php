@@ -15,8 +15,10 @@ class AdminContext
 
     public function user(): AdminUser
     {
+        // get guard from identity auth middleware
+        $guard = request()->attributes->get('identity.guard') ?? 'web';
         return new AdminUser(
-            Auth::user()
+            Auth::guard($guard)->user()
         );
     }
 

@@ -1,4 +1,5 @@
 <header class="flex h-[72px] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-8">
+    {{ $admin->id ?? 'nothing found' }}
 
     <div class="flex items-center gap-3">
 
